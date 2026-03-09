@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body { margin:0; padding:20px; font-family:sans-serif; background:#000; color:#fff; text-align:center; touch-action:none; }
+        .section { background:#fff; color:#000; padding:20px; border:6px solid #000; border-radius:25px; margin-bottom:40px; box-shadow:10px 10px 0#333; }
+        canvas { background:#fff; border:3px solid #000; width:100%; max-width:280px; }
+        button { background:#000; color:#fff; border:none; padding:15px; font-weight:900; border-radius:10px; cursor:pointer; margin-top:10px; }
+        #clickBtn { width:120px; height:120px; border-radius:50%; background:#000; color:#fff; font-size:30px; border:none; font-weight:900; }
+        a.tk { display:block; background:#ff0050; color:#fff; padding:20px; border-radius:15px; font-weight:900; text-decoration:none; font-size:20px; }
+    </style>
+</head>
+<body style="overflow-y: scroll; touch-action: auto;">
+
+    <h1>SHIBUYA ARCADE</h1>
+    <p>Scroll down to play / 下にスクロール</p>
+
+    <!-- TIKTOK -->
+    <div class="section" style="background:#000; border-color:#fff;">
+        <a href="https://www.tiktok.com" class="bt tk">TIKTOK: @emptynam4</a>
+    </div>
+
+    <!-- CLICKER -->
+    <div class="section">
+        <h2>1. SPEED TEST</h2>
+        <div id="t-disp" style="visibility:hidden;">TIME: <span id="sec">10.0</span>s</div>
+        <button id="clickBtn">0</button>
+        <p id="c-msg"></p>
+        <button onclick="location.reload()">RESTART</button>
+    </div>
+
+    <!-- BIRD -->
+    <div class="section">
+        <h2>2. SKILL TEST</h2>
+        <canvas id="cvs" width="280" height="350"></canvas>
+        <p id="b-msg"></p>
+        <button onclick="location.reload()">RESTART</button>
+    </div>
+
+    <p style="font-size:11px; opacity:0.6;">1 Phone. 1 Blanket. 0 Japanese.</p>
+
+<script>
+// CLICKER LOGIC
+let c=0,ct=10,ca=false,ce=false,ci;
+const cb=document.getElementById('clickBtn'),cm=document.getElementById('c-msg');
+cb.onclick=()=>{
+    if(ce)return;
+    if(!ca){ca=true;document.getElementById('t-disp').style.visibility='visible';
+    ci=setInterval(()=>{ct-=0.1;document.getElementById('sec').innerText=Math.max(0,ct).toFixed(1);if(ct<=0){clearInterval(ci);ce=true;cb.style.background="#888";cm.innerText=c>=50?"LEGEND!":"LAME.";}},100);}
+    c++;cb.innerText=c;
+};
+
+// BIRD LOGIC
+const cvs=document.getElementById("cvs"),ctx=cvs.getContext("2d");
+let b={x:40,y:120,w:15,h:15,g:0.2,j:4,v:0},ps=[],s=0,over=false,st=false;
+function draw(){
+    ctx.fillStyle="white";ctx.fillRect(0,0,280,350);
+    ctx.fillStyle="black";ctx.fillRect(b.x,b.y,b.w,b.h);
+    ps.forEach(p=>{ctx.fillRect(p.x,0,40,p.t);ctx.fillRect(p.x,p.b,40,350-p.b);if(!over&&st)p.x-=2;if(p.x+40===b.x)s++;});
+    ctx.font="bold 25px sans-serif";ctx.fillText(s,130,35);
+    if(st&&!over){b.v+=b.g;b.y+=b.v;if(b.y+15>350||b.y<0)over=true;ps.forEach(p=>{if(b.x+15>p.x&&b.x<p.x+40&&(b.y<p.t||b.y+15>p.b))over=true;});
+    if(ps.length===0||ps[ps.length-1].x<120){let g=110,pos=Math.random()*150+50;ps.push({x:280,t:pos,b:pos+g});}}
+    if(over)document.getElementById('b-msg').innerText="GAME OVER! SCORE: "+s;
+    if(!over)requestAnimationFrame(draw);
+}
+cvs.addEventListener("touchstart",(e)=>{e.preventDefault();if(!st)st=true;if(!over)b.v=-b.j;},{passive:false});
+draw();
+</script>
+</body>
+</html>
